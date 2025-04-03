@@ -1,18 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function App() {
-    const [count, setCount] = useState(0);
+function App() {
+  const [nome, setNome] = useState("");
+  const [nomes, setNomes] = useState([]);
 
-    return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-            <h1 className="text-2xl font-bold mb-4">Projeto React Simples</h1>
-            <p className="text-lg">Contador: {count}</p>
-            <button
-                onClick={() => setCount(count + 1)}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            >
-                Incrementar
-            </button>
-        </div>
-    );
+  useEffect(() => {
+    fetch("https://testeverselmongodb.vercel.app")
+      .then((res) => res.json())
+      .then((data) => setNomes(data));
+  }, []);
+
+  const adicionarNome = () => {
+    fetch("https://testeverselmongodb.vercel.app", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome }),
+    })
+      .then(() => setNomes([...nomes, { nome }]))
+      .then(() => setNome(""));
+  };
+
+  return (
+    <div>
+      <h1>Salvar Nome</h1>
+      <input 
+        type="text" 
+        value={nome} 
+        onChange={(e) => setNome(e.target.value)} 
+      />
+      <button onClick={adicionarNome}>Salvar</button>
+      <ul>
+        {nomes.map((n, index) => (
+          <li key={index}>{n.nome}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }
+
+export default App;
